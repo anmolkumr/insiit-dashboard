@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mess Details</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+  /* Add CSS styling here */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+  .loading {
+    display: none;
+  }
+  .mess-details {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+<div class="mess-details">
+  <div id="mess-location"></div>
+  <div id="mess-timings"></div>
+  <div id="mess-rating"></div>
+
+  <h2>Menu</h2>
+  <div id="menu" class="table-responsive"></div>
+</div>
+
+<div class="loading text-center">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+  <p>Loading...</p>
+</div>
+
+<script>
+  // Show loading indicator
+  document.querySelector('.loading').style.display = 'block';
+
+  // Fetch data from the API endpoint
+  fetch('https://insiit-api.onrender.com/mess/2')
+    .then(response => response.json())
+    .then(data => {
+      // Hide loading indicator
+      document.querySelector('.loading').style.display = 'none';
+
+      // Update HTML elements with fetched data
+      document.getElementById('mess-location').textContent = `Location: ${data.mess.location.latitude}, ${data.mess.location.longitude} (${data.mess.landmark})`;
+
+      // Display timings
+      const timings = data.mess.timings;
+      let timingsHTML = '<h2>Timings</h2>';
+      for (const [key, value] of Object.entries(timings)) {
+        timingsHTML += `<div><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${value.start} - ${value.end}</div>`;
+      }
+      document.getElementById('mess-timings').innerHTML = timingsHTML;
+
+      // Display rating
+      document.getElementById('mess-rating').textContent = `Rating: ${data.mess.rating}`;
+
+      // Display menu
+      const menu = data.mess.menu;
+      let menuHTML = '<table class="table table-bordered">';
+      for (const [key, value] of Object.entries(menu)) {
+        if (key !== 'id' && key !== 'month' && key !== 'year') {
+          menuHTML += `<thead><tr><th colspan="2">${key.charAt(0).toUpperCase() + key.slice(1)}</th></tr></thead><tbody>`;
+          for (const meal in value) {
+            if (value[meal]) {
+              menuHTML += `<tr><td><strong>${meal.charAt(0).toUpperCase() + meal.slice(1)}</strong></td><td>`;
+              value[meal].forEach(item => {
+                menuHTML += `<div>${item.name} - ${item.cal} cal</div>`;
+              });
+              menuHTML += `</td></tr>`;
+            }
+          }
+          menuHTML += `</tbody>`;
+        }
+      }
+      menuHTML += '</table>';
+      document.getElementById('menu').innerHTML = menuHTML;
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+      // Hide loading indicator and show error message
+      document.querySelector('.loading').style.display = 'none';
+      document.getElementById('menu').innerHTML = '<div class="alert alert-danger" role="alert">Error fetching data. Please try again later.</div>';
+    });
+</script>
+</body>
+</html>

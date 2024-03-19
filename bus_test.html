@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Routes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Add CSS styling here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .spinner-border {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Bus Routes</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Route Name</th>
+                        <th>From Stop</th>
+                        <th>To Stop</th>
+                        <th>Via Stops</th>
+                    </tr>
+                </thead>
+                <tbody id="bus-routes-body">
+                    <!-- Bus routes will be populated here -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Loading spinner -->
+        <div class="text-center mt-3">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch bus routes from the API
+        function fetchBusRoutes() {
+            // Show loading spinner
+            document.querySelector('.spinner-border').style.display = 'block';
+            fetch('https://insiit-api.onrender.com/bus_route')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Once data is received, hide loading spinner and populate the table
+                    document.querySelector('.spinner-border').style.display = 'none';
+                    populateBusRoutes(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to fetch bus routes. Please try again.');
+                    // Hide loading spinner in case of error
+                    document.querySelector('.spinner-border').style.display = 'none';
+                });
+        }
+
+        // Function to populate bus routes in the table
+        function populateBusRoutes(busRoutesData) {
+            const tbody = document.getElementById('bus-routes-body');
+            const routes = busRoutesData.routes;
+            routes.forEach(route => {
+                const viaStops = route.via_stops.map(stop => stop.name).join(', ');
+                const row = `
+        <tr>
+          <td>${route.name}</td>
+          <td>${route.from_stop.name}, ${route.from_stop.landmark}</td>
+          <td>${route.to_stop.name}, ${route.to_stop.landmark ? route.to_stop.landmark : ''}</td>
+          <td>${viaStops}</td>
+        </tr>
+      `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // Fetch bus routes when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchBusRoutes();
+        });
+    </script>
+</body>
+
+</html>
