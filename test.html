@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const jsonData = {
+            "menu": {
+                "monday": {
+                    "breakfast": [{ "name": "Poha" }, { "name": "Panchratna Dal" }],
+                    "lunch": [{ "name": "Jeera Rice" }],
+                    "snacks": [{ "name": "Poha" }],
+                    "dinner": [{ "name": "Panchratna Dal" }, { "name": "Jeera Rice" }]
+                },
+                "tuesday": {
+                    "breakfast": [{ "name": "Poha" }],
+                    "lunch": [{ "name": "Panchratna Dal" }],
+                    "snacks": [{ "name": "Poha" }],
+                    "dinner": [{ "name": "Jeera Rice" }]
+                },
+                "wednesday": {
+                    "breakfast": [{ "name": "Poha" }],
+                    "lunch": [{ "name": "Panchratna Dal" }, { "name": "Jeera Rice" }],
+                    "snacks": [{ "name": "" }],
+                    "dinner": [{ "name": "Panchratna Dal" }]
+                },
+                "thursday": {
+                    "breakfast": [{ "name": "Poha" }],
+                    "lunch": [{ "name": "" }],
+                    "snacks": [{ "name": "Poha" }],
+                    "dinner": [{ "name": "Panchratna Dal" }, { "name": "Jeera Rice" }]
+                },
+                "friday": {
+                    "breakfast": [{ "name": "Poha" }],
+                    "lunch": [{ "name": "Panchratna Dal" }],
+                    "snacks": [{ "name": "Poha" }],
+                    "dinner": [{ "name": "Jeera Rice" }]
+                },
+                "saturday": {
+                    "breakfast": [{ "name": "Poha" }],
+                    "lunch": [{ "name": "Jeera Rice" }, { "name": "Panchratna Dal" }],
+                    "snacks": [{ "name": "Poha" }],
+                    "dinner": [{ "name": "" }]
+                },
+                "sunday": {
+                    "breakfast": [{ "name": "" }],
+                    "lunch": [{ "name": "Panchratna Dal" }, { "name": "Jeera Rice" }, { "name": "Poha" }],
+                    "snacks": [{ "name": "Poha" }],
+                    "dinner": [{ "name": "" }]
+                }
+            }
+        };
+
+        // Extracting distinct names
+        const distinctNames = Object.values(jsonData.menu)
+            .flatMap(day => Object.values(day))
+            .flatMap(meals => meals.map(item => item.name))
+            .filter((value, index, self) => self.indexOf(value) === index && value !== "");
+
+        console.log(distinctNames);
+        const menuNames = [];
+
+        fetch('https://insiit-api.onrender.com/mess_menu_item')
+            .then(response => response.json())
+            .then(data => {
+                // Extract the array of items
+                const items = data.items;
+
+                // Extract names of menu items
+                const menuNames = items.map(item => item.name);
+                console.log(menuNames);
+            })
+            .catch(error => console.error('Error fetching menu items:', error));
+
+        const nonMatchingItems = distinctNames.filter(name => !menuNames.includes(name));
+        console.log(nonMatchingItems);
+
+    </script>
+</body>
+
+</html>

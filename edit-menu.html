@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mess Menu</title>
+  <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    #messMenu {
+      width: 800px;
+      height: 300px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body onload="addMenu()">
+  <div id="messMenu"></div>
+  <button onclick="addMenu()">Add Mess Menu</button>
+  <button onclick="exportToJson()">Export to JSON</button> <!-- New button for exporting -->
+
+  <script>
+    // Initial data for the Handsontable
+    const initialData = [
+      ['', '', '', '', '', '', ''],
+      ['', '', '', '', '', '', ''],
+      ['', '', '', '', '', '', ''],
+      ['', '', '', '', '', '', '']
+    ];
+
+    // Handsontable settings
+    const hotSettings = {
+      data: initialData,
+      colHeaders: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      rowHeaders: ['Breakfast', 'Lunch', 'Snacks', 'Dinner'],
+      rowWidth: 100,
+
+      height: 'auto',
+      width: '100%',
+      readOnly: false,
+      colWidths: 100,
+      rowHeights: 60,
+      stretchH: 'all',
+      stretchW: 'all',
+      manualColumnResize: true,
+      autoWrapRow: true,
+      autoWrapCol: true,
+      contextMenu: true,
+      licenseKey: 'non-commercial-and-evaluation',
+      afterChange: (changes, source) => {
+        if (source === 'edit') {
+          console.log('Data changed', changes);
+        }
+      }
+    };
+
+    // Initialize Handsontable
+    const container = document.getElementById('messMenu');
+    const hot = new Handsontable(container, hotSettings);
+
+    // Function to add mess menu
+    let globalMenuId; // Declare a variable to store the _id globally
+
+    async function addMenu() {
+      try {
+        const response = await fetch('http://localhost:3000/api/mess-menu'); // Fetch data from the API endpoint
+        const menuData = await response.json(); // Parse the JSON response
+
+        globalMenuId = menuData._id; // Store the _id globally
+
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+        for (const item of menuData.mess) {
+          const dayIndex = item.day - 1;
+          hot.setDataAtCell(0, dayIndex, item.breakfast);
+          hot.setDataAtCell(1, dayIndex, item.lunch);
+          hot.setDataAtCell(2, dayIndex, item.snacks);
+          hot.setDataAtCell(3, dayIndex, item.dinner);
+        }
+      } catch (error) {
+        console.error('Error fetching menu data:', error);
+      }
+    }
+
+
+    function exportToJson() {
+      const jsonData = [];
+
+      const daysOfWeek = [1, 2, 3, 4, 5, 6, 7];
+
+      daysOfWeek.forEach((day, colIndex) => {
+        const breakfast = hot.getDataAtCol(colIndex)[0];
+        const lunch = hot.getDataAtCol(colIndex)[1];
+        const snacks = hot.getDataAtCol(colIndex)[2];
+        const dinner = hot.getDataAtCol(colIndex)[3];
+
+        jsonData.push({
+          day,
+          breakfast,
+          lunch,
+          snacks,
+          dinner
+        });
+      });
+
+      // Get the ID from the first cell of the Handsontable instance
+      const id = globalMenuId;
+      console.log(JSON.stringify(jsonData));
+
+      // Send the JSON data to the API endpoint using PUT method
+      fetch(`http://localhost:3000/api/mess-menu/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(jsonData)
+      })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Failed to update JSON data. Please try again.');
+          }
+        })
+        .then(data => {
+          console.log('JSON data updated successfully:', data);
+          // You can handle the response data here as needed
+        })
+        .catch(error => {
+          console.error('Error updating JSON data:', error);
+          // You can handle errors here (e.g., display an error message to the user)
+        });
+    }
+
+
+  </script>
+</body>
+
+</html>

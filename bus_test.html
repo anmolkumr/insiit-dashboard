@@ -4,95 +4,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bus Routes</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        /* Add CSS styling here */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-        .spinner-border {
-            display: none;
-        }
+    <title>Bus Schedule Management</title>
+    <style>
+        /* Add your CSS styles here */
     </style>
 </head>
 
 <body>
+    <h1>Bus Schedule Management</h1>
+
     <div class="container">
-        <h2>Bus Routes</h2>
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Route Name</th>
-                        <th>From Stop</th>
-                        <th>To Stop</th>
-                        <th>Via Stops</th>
-                    </tr>
-                </thead>
-                <tbody id="bus-routes-body">
-                    <!-- Bus routes will be populated here -->
-                </tbody>
-            </table>
-        </div>
-        <!-- Loading spinner -->
-        <div class="text-center mt-3">
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
-    </div>
+        <h1 class="mt-5">Bus Schedule Management</h1>
+    
+        <h2 class="mt-4">Insert New Bus Schedule</h2>
+        <form id="insertForm">
+          <div class="mb-3">
+            <label for="busName" class="form-label">Bus Name:</label>
+            <input type="text" class="form-control" id="busName" name="busName" required>
+          </div>
+          <div class="mb-3">
+            <label for="departureTime" class="form-label">Departure Time:</label>
+            <input type="text" class="form-control" id="departureTime" name="departureTime" required>
+          </div>
+          <div class="mb-3">
+            <label for="destination" class="form-label">Destination:</label>
+            <input type="text" class="form-control" id="destination" name="destination" required>
+          </div>
+          <div class="mb-3">
+            <label for="source" class="form-label">Source:</label>
+            <input type="text" class="form-control" id="source" name="source" required>
+          </div>
+          <div class="mb-3">
+            <label for="stops" class="form-label">Stops:</label>
+            <input type="text" class="form-control" id="stops" name="stops" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    
+        <!-- Rest of your HTML content goes here -->
+    
+      </div>
+    
+
+    <h2>Search for Buses</h2>
+    <form id="searchForm">
+        <label for="sourceSearch">Source:</label>
+        <input type="text" id="sourceSearch" name="sourceSearch"><br>
+        <label for="destinationSearch">Destination:</label>
+        <input type="text" id="destinationSearch" name="destinationSearch"><br>
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="output"></div>
 
     <script>
-        // Function to fetch bus routes from the API
-        function fetchBusRoutes() {
-            // Show loading spinner
-            document.querySelector('.spinner-border').style.display = 'block';
-            fetch('https://insiit-api.onrender.com/bus_route')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Once data is received, hide loading spinner and populate the table
-                    document.querySelector('.spinner-border').style.display = 'none';
-                    populateBusRoutes(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to fetch bus routes. Please try again.');
-                    // Hide loading spinner in case of error
-                    document.querySelector('.spinner-border').style.display = 'none';
-                });
-        }
+        // Add your JavaScript code here to handle form submissions and interactions with Express routes
 
-        // Function to populate bus routes in the table
-        function populateBusRoutes(busRoutesData) {
-            const tbody = document.getElementById('bus-routes-body');
-            const routes = busRoutesData.routes;
-            routes.forEach(route => {
-                const viaStops = route.via_stops.map(stop => stop.name).join(', ');
-                const row = `
-        <tr>
-          <td>${route.name}</td>
-          <td>${route.from_stop.name}, ${route.from_stop.landmark}</td>
-          <td>${route.to_stop.name}, ${route.to_stop.landmark ? route.to_stop.landmark : ''}</td>
-          <td>${viaStops}</td>
-        </tr>
-      `;
-                tbody.innerHTML += row;
-            });
-        }
-
-        // Fetch bus routes when the page loads
         document.addEventListener('DOMContentLoaded', function () {
-            fetchBusRoutes();
-        });
+  const insertForm = document.getElementById('insertForm');
+  const searchForm = document.getElementById('searchForm');
+  const outputDiv = document.getElementById('output');
+
+  // Function to fetch data from Express API
+  const fetchData = async (url) => {
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  // Function to handle form submission for inserting bus schedule
+  insertForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const busData = {
+      BusName: formData.get('busName'),
+      DepartureTime: formData.get('departureTime'),
+      Destination: formData.get('destination'),
+      Source: formData.get('source'),
+      Stops: formData.get('stops').split(',').map(s => s.trim()) // Split stops by comma and remove extra spaces
+    };
+
+    try {
+      const response = await fetch('http://localhost:3000/api/buses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(busData)
+      });
+      const data = await response.json();
+      console.log('Inserted data:', data);
+      // Optionally, update UI with the inserted data
+    } catch (error) {
+      console.error('Error inserting data:', error);
+    }
+  });
+
+  // Function to handle form submission for searching buses
+  searchForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const source = this.sourceSearch.value;
+    const destination = this.destinationSearch.value;
+
+    // Construct the URL for searching buses
+    const url = `http://localhost:3000/api/search?source=${encodeURIComponent(source)}&destination=${encodeURIComponent(destination)}`;
+
+    const searchData = await fetchData(url);
+    console.log('Search results:', searchData);
+
+    // Optionally, update UI with the search results
+    // For example, display the search results in the outputDiv
+    outputDiv.innerHTML = JSON.stringify(searchData, null, 2);
+  });
+});
+
     </script>
 </body>
 

@@ -14,14 +14,14 @@
   <link rel="stylesheet" href="css/mdb.min.css" />
   <!-- Custom styles -->
   <link rel="stylesheet" href="css/admin.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"
-    integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="
-    crossorigin="anonymous"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css" rel="stylesheet">
 
 
 </head>
 
-<body>
+<body onload="addMenu()">
   <!--Main Navigation-->
   <header>
     <!-- Sidebar -->
@@ -133,72 +133,75 @@
         </div>
 
         <h2>Mess</h2>
-        <div id="menu" class="table-responsive"></div>
-      </div>
-
-      <div class="loading text-center">
-        <div class="spinner-border" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <p>Loading...</p>
+        <div id="messMenu"></div>
       </div>
 
       <script>
-        // Show loading indicator
-        document.querySelector('.loading').style.display = 'block';
+        const initialData = [
+          ['', '', '', '', '', '', ''],
+          ['', '', '', '', '', '', ''],
+          ['', '', '', '', '', '', ''],
+          ['', '', '', '', '', '', '']
+        ];
 
-        // Fetch data from the API endpoint
-        fetch('https://insiit-api.onrender.com/mess/2')
-          .then(response => response.json())
-          .then(data => {
-            // Hide loading indicator
-            document.querySelector('.loading').style.display = 'none';
+        // Handsontable settings
+        const hotSettings = {
+          data: initialData,
+          colHeaders: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+          rowHeaders: ['Breakfast', 'Lunch', 'Snacks', 'Dinner'],
+          rowWidth: 100,
 
-            // Update HTML elements with fetched data
-            document.getElementById('mess-location').textContent = `Location: ${data.mess.location.latitude}, ${data.mess.location.longitude} (${data.mess.landmark})`;
-
-            // Display timings
-            const timings = data.mess.timings;
-            let timingsHTML = '<h2>Timings</h2>';
-            for (const [key, value] of Object.entries(timings)) {
-              timingsHTML += `<div><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${value.start} - ${value.end}</div>`;
+          height: 'auto',
+          width: '100%',
+          readOnly: true,
+          colWidths: 100,
+          rowHeights: 60,
+          stretchH: 'all',
+          stretchW: 'all',
+          manualColumnResize: true,
+          autoWrapRow: true,
+          autoWrapCol: true,
+          contextMenu: true,
+          licenseKey: 'non-commercial-and-evaluation',
+          afterChange: (changes, source) => {
+            if (source === 'edit') {
+              console.log('Data changed', changes);
             }
-            document.getElementById('mess-timings').innerHTML = timingsHTML;
+          }
+        };
 
-            // Display rating
-            document.getElementById('mess-rating').textContent = `Rating: ${data.mess.rating}`;
+        // Initialize Handsontable
+        const container = document.getElementById('messMenu');
+        const hot = new Handsontable(container, hotSettings);
 
+        // Function to add mess menu
+        let globalMenuId; // Declare a variable to store the _id globally
 
+        async function addMenu() {
+          try {
+            const response = await fetch('http://localhost:3000/api/mess-menu'); // Fetch data from the API endpoint
+            const menuData = await response.json(); // Parse the JSON response
 
+            globalMenuId = menuData._id; // Store the _id globally
 
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-            // Display menu
-            const menu = data.mess.menu;
-            let menuHTML = '<table class="table table-striped">';
-            for (const [key, value] of Object.entries(menu)) {
-              if (key !== 'id' && key !== 'month' && key !== 'year') {
-                menuHTML += `<thead><tr><th colspan="2">${key.charAt(0).toUpperCase() + key.slice(1)}</th></tr></thead><tbody>`;
-                for (const meal in value) {
-                  if (value[meal]) {
-                    menuHTML += `<tr><td><strong>${meal.charAt(0).toUpperCase() + meal.slice(1)}</strong></td><td>`;
-                    value[meal].forEach(item => {
-                      menuHTML += `<div>${item.name} - ${item.cal} cal</div>`;
-                    });
-                    menuHTML += `</td></tr>`;
-                  }
-                }
-                menuHTML += `</tbody>`;
-              }
+            for (const item of menuData.mess) {
+              const dayIndex = item.day - 1;
+              hot.setDataAtCell(0, dayIndex, item.breakfast);
+              hot.setDataAtCell(1, dayIndex, item.lunch);
+              hot.setDataAtCell(2, dayIndex, item.snacks);
+              hot.setDataAtCell(3, dayIndex, item.dinner);
             }
-            menuHTML += '</table>';
-            document.getElementById('menu').innerHTML = menuHTML;
-          })
-          .catch(error => {
-            console.error('Error fetching data:', error);
-            // Hide loading indicator and show error message
-            document.querySelector('.loading').style.display = 'none';
-            document.getElementById('menu').innerHTML = '<div class="alert alert-danger" role="alert">Error fetching data. Please try again later.</div>';
-          });
+          } catch (error) {
+            console.error('Error fetching menu data:', error);
+          }
+        }
+
+
+
+
+
       </script>
     </div>
   </main>
