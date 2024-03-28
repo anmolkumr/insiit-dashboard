@@ -14,9 +14,13 @@
   <link rel="stylesheet" href="css/mdb.min.css" />
   <!-- Custom styles -->
   <link rel="stylesheet" href="css/admin.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"
     integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="
     crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -51,27 +55,20 @@
         </div>
       </div>
     </nav>
-    <!-- Sidebar -->
 
-    <!-- Navbar -->
     <nav id="main-navbar" class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
-      <!-- Container wrapper -->
       <div class="container-fluid">
-        <!-- Toggle button -->
         <button class="navbar-toggler" type="button" data-mdb-collapse-init data-mdb-target="#sidebarMenu"
           aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
           <i class="fas fa-bars"></i>
         </button>
 
-        <!-- Brand -->
         <a class="navbar-brand" href="#">
           <img src="/img/Icon.png" height="35" alt="" loading="lazy" /> InsIIT Admin Panel
         </a>
 
 
-        <!-- Right links -->
         <ul class="navbar-nav ms-auto d-flex flex-row">
-          <!-- Notification dropdown -->
           <li class="nav-item dropdown">
             <a class="nav-link me-3 me-lg-0 dropdown-toggle hidden-arrow" href="#" id="navbarDropdownMenuLink"
               role="button" data-mdb-dropdown-init aria-expanded="false">
@@ -87,7 +84,6 @@
             </ul>
           </li>
 
-          <!-- Icon -->
           <li class="nav-item">
             <a class="nav-link me-3 me-lg-0" href="#">
               <i class="fas fa-fill-drip"></i>
@@ -120,12 +116,193 @@
   </header>
   <!--Main Navigation-->
 
+  <main style="margin-top: 70px">
+    <div class="container pt-4">
 
-    <!-- MDB -->
-    <script type="text/javascript" src="js/mdb.umd.min.js"></script>
-    <!-- Custom scripts -->
-    <script type="text/javascript" src="js/admin.js"></script>
-  
-  </body>
-  
-  </html>
+      <h4>Outlets</h4>
+      <br>
+      <button type="button" class="btn btn-primary" data-mdb-ripple-init data-mdb-modal-init
+        data-mdb-target="#addOutlets">
+        Add Outlet
+      </button> <br><br>
+      <div class="pt-4">
+        <!-- Add New Event Modal -->
+        <div class="modal fade" id="addOutlets" tabindex="-1" aria-labelledby="addOutletsLabel" aria-hidden="true">
+          <div class="modal-dialog .modal-fullscreen-sm-down">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="addOutletsLabel">Add New Outlet</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="addOutletsForm">
+                  <div class="mb-3">
+                    <label for="outletName" class="form-label">Outlet Name</label>
+                    <input type="text" class="form-control" id="outletName" name="outletName" required>
+                  </div>
+                  <div id="map" style="height: 400px;"></div>
+                  <div class="mb-3">
+
+                    <label for="location" class="form-label">Location</label>
+                    <div class="row">
+                      <div class="col">
+                        <input type="text" class="form-control" id="latitude" name="latitude" placeholder="Latitude"
+                          required>
+                      </div>
+                      <div class="col">
+                        <input type="text" class="form-control" id="longitude" name="longitude" placeholder="Longitude"
+                          required>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="landmark" class="form-label">Location in Words</label>
+                    <input type="text" class="form-control" id="landmark" name="landmark" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="open_time" class="form-label">Opens At</label>
+                    <input type="text" class="form-control" id="open_time" name="open_time" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="close_time" class="form-label">Close Time</label>
+                    <input type="text" class="form-control" id="close_time" name="close_time" required>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="updateOutletModal" tabindex="-1" aria-labelledby="updateOutletModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog .modal-fullscreen-sm-down">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="updateOutletModalLabel">Update Event</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="updateOutletForm">
+                  <div class="mb-3">
+                    <label for="edit-outlet-id" class="form-label">Outlet ID</label>
+                    <input type="text" class="form-control" id="edit-outlet-id" required disabled>
+                  </div>
+                  <div class="mb-3">
+                    <label for="edit-outlet-name" class="form-label">Outlet Name</label>
+                    <input type="text" class="form-control" id="edit-outlet-name" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="edit-outlet-location" class="form-label">Location/Landmark</label>
+                    <input type="text" class="form-control" id="edit-outlet-location" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="edit-outlet-date" class="form-label">Open Time</label>
+                    <input type="text" class="form-control" id="edit-outlet-open-time" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="edit-outlet-start" class="form-label">Close Time</label>
+                    <input type="text" class="form-control" id="edit-outlet-close-time" required>
+                  </div>
+                  <button onclick="updateOutlet()" class="btn btn-primary">Submit</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="updateOutletMenu" tabindex="-1" aria-labelledby="updateOutletMenuLabel"
+          aria-hidden="true">
+          <div class="modal-dialog .modal-fullscreen-sm-down">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="updateOutletMenuLabel">Update Event</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div id="hot-container"></div>
+              </div>
+
+              <button onclick="updateOutletMenu()" class="btn btn-primary">Submit</button>
+
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="table-responsive">
+          <table class="table table-bordered" id="outlets-table-body">
+          </table>
+        </div>
+        <!-- Loading spinner -->
+        <div class="text-center mt-3">
+          <div class="spinner-border" id="spinner" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    var initial_pos = L.latLng(23.21049, 72.68475);
+    var map = L.map('map').setView(initial_pos, 17); // Set zoom level to 17
+
+    // Add a tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var marker = L.marker(initial_pos).addTo(map);
+
+    map.on('click', function (e) {
+      var latitude = e.latlng.lat.toFixed(6);
+      var longitude = e.latlng.lng.toFixed(6);
+      document.getElementById('latitude').value = latitude;
+      document.getElementById('longitude').value = longitude;
+      marker.setLatLng(e.latlng);
+    });
+    document.getElementById('addOutletsForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const outletData = {
+        name: document.getElementById('outletName').value,
+        location: {
+          latitude: document.getElementById('latitude').value,
+          longitude: document.getElementById('longitude').value
+        }, landmark: document.getElementById('landmark').value,
+        open_time: document.getElementById('open_time').value,
+        close_time: document.getElementById('close_time').value,
+      };
+      console.log(outletData);
+      try {
+        const response = await fetch('http://localhost:3000/api/outlets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(outletData)
+        });
+        if (!response.ok) {
+          throw new Error('Failed to add outlet');
+        }
+        console.log("Added outlet successfully");
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to add outlet. Please try again.');
+      }
+    });
+
+  </script>
+  <!-- MDB -->
+  <script type="text/javascript" src="js/mdb.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+  <script type="text/javascript" src="js/admin.js"></script>
+
+
+</body>
+
+</html>

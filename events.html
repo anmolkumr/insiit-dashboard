@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
-  <title>Material Design for Bootstrap</title>
+  <title>Events Calender | InsIIT</title>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css" />
   <!-- Google Fonts Roboto -->
@@ -128,7 +128,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="addEventModalLabel">Add New Event</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <form id="addEventForm">
@@ -169,11 +169,11 @@
 
       <div class="modal fade" id="updateEventModal" tabindex="-1" aria-labelledby="updateEventModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog .modal-fullscreen-sm-down">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="updateEventModalLabel">Update Event</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <form id="updateEventForm">
@@ -218,7 +218,7 @@
 
       <!-- Button to open Add New Event Modal -->
       <button type="button" class="btn btn-primary" data-mdb-ripple-init data-mdb-modal-init
-        data-mdb-target="#addEventModal">
+        data-mdb-target="#addEventModal"><i class="fas fa-plus"></i> &nbsp;
         Add Event
       </button>
       <table class="table" id="events-table-body">

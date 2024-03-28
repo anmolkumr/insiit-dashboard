@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Coordinates from Map</title>
+    <!-- Material Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Select Coordinates from Map</h1>
+    <!-- Modal -->
+    <div class="modal fade" id="addOutlets" tabindex="-1" aria-labelledby="addOutletsLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addOutletsLabel">Add New Outlet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form -->
+                    <form id="addOutletsForm">
+                        <div class="form-group">
+                            <label for="outletName">Outlet Name:</label>
+                            <input type="text" class="form-control" id="outletName" name="outletName" required>
+                        </div>
+                        <!-- Map container -->
+                        <div id="map"></div>
+                        <div class="form-group">
+                            <label for="latitude">Latitude:</label>
+                            <input type="text" class="form-control" id="latitude" name="latitude" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="longitude">Longitude:</label>
+                            <input type="text" class="form-control" id="longitude" name="longitude" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="landmark">Location in Words:</label>
+                            <input type="text" class="form-control" id="landmark" name="landmark" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="open_time">Opens At:</label>
+                            <input type="text" class="form-control" id="open_time" name="open_time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="close_time">Close Time:</label>
+                            <input type="text" class="form-control" id="close_time" name="close_time" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Material Bootstrap JS -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+    <script>
+        // Initialize the map with the specified initial position and zoom level
+        var initPosition = L.latLng(23.21049, 72.68475);
+        var map = L.map('map').setView(initPosition, 17); // Set zoom level to 17
+
+        // Add a tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add a marker when clicking on the map
+        var marker = L.marker(initPosition).addTo(map);
+
+        // Update the latitude and longitude input fields when clicking on the map
+        map.on('click', function (e) {
+            var latitude = e.latlng.lat.toFixed(6);
+            var longitude = e.latlng.lng.toFixed(6);
+            document.getElementById('latitude').value = latitude;
+            document.getElementById('longitude').value = longitude;
+            marker.setLatLng(e.latlng);
+        });
+    </script>
+</body>
+
+</html>
