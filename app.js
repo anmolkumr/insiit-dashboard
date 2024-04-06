@@ -17,7 +17,9 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.set("views", __dirname + "/views");
 app.set('view engine', 'ejs');
+
 
 
 app.get('/mess', checkAuthenticated, function (req, res) {
