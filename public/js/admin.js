@@ -1,4 +1,6 @@
 // Function to handle form submission for adding a new event
+const apiurl = 'https://insiit-backend-node.vercel.app';
+
 if (document.getElementById('addEventForm')) {
   document.getElementById('addEventForm').addEventListener('submit', async function (event) {
     event.preventDefault();
@@ -16,7 +18,7 @@ if (document.getElementById('addEventForm')) {
 
     // Send POST request to add new event
     try {
-      const response = await fetch('http://localhost:3000/api/events', {
+      const response = await fetch(`${apiurl}/api/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -36,7 +38,7 @@ if (document.getElementById('addEventForm')) {
 }
 // Fetch all events and populate the table
 function fetchEvents() {
-  fetch('http://localhost:3000/api/events')
+  fetch(`${apiurl}/api/events`)
     .then(response => response.json())
     .then(events => {
       const tableBody = document.getElementById('events-table-body');
@@ -63,7 +65,7 @@ function fetchEvents() {
 // Function to open the edit event modal with pre-populated data
 function editEvent(eventId) {
   // Fetch event details by eventId
-  fetch(`http://localhost:3000/api/events/${eventId}`)
+  fetch(`${apiurl}/api/events/${eventId}`)
     .then(response => response.json())
     .then(event => {
       // Populate the modal fields with event details
@@ -84,7 +86,8 @@ function editEvent(eventId) {
 }
 
 // Function to update an event
-function updateEvent() {
+function updateEvent(event) {
+  event.preventDefault();
 
   const eventId = document.getElementById('edit-event-id').value;
   const updatedEvent = {
@@ -100,10 +103,11 @@ function updateEvent() {
 
   // Send PUT request to update the event
   console.log(JSON.stringify(updatedEvent));
-  fetch(`http://localhost:3000/api/events/${eventId}`, {
+  fetch(`${apiurl}/api/events/${eventId}`, {
     method: 'PUT',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'x-api-key': 'metis-at-insiit'
     },
     body: JSON.stringify(updatedEvent)
   })
@@ -113,7 +117,7 @@ function updateEvent() {
       // Close the modal
       $('#editEventModal').modal('hide');
       // Refresh the events table
-      fetchEvents();
+      // fetchEvents();
     })
     .catch(error => console.error('Error updating event:', error));
 }
@@ -123,8 +127,11 @@ function deleteEvent(eventId) {
   // Confirm deletion
   if (confirm('Are you sure you want to delete this event?')) {
     // Send DELETE request to delete the event
-    fetch(`http://localhost:3000/api/events/${eventId}`, {
-      method: 'DELETE'
+    fetch(`${apiurl}/api/events/${eventId}`, {
+      method: 'DELETE',
+      headers: {
+        'x-api-key': 'metis-at-insiit'
+      }
     })
       .then(response => {
         if (response.ok) {
@@ -146,7 +153,7 @@ if (document.getElementById('events-table-body')) {
 }
 
 function fetchOutlets() {
-  fetch('http://localhost:3000/api/outlets')
+  fetch(`${apiurl}/api/outlets`)
     .then(response => response.json())
     .then(outlets => {
       const spinner = document.getElementById('spinner');
@@ -180,7 +187,7 @@ if (document.getElementById('outlets-table-body')) {
 }
 
 function editOutlet(outletId) {
-  fetch(`http://localhost:3000/api/outlets/${outletId}`)
+  fetch(`${apiurl}/api/outlets/${outletId}`)
     .then(response => response.json())
     .then(outlet => {
       document.getElementById('edit-outlet-id').value = outlet._id;
@@ -192,7 +199,8 @@ function editOutlet(outletId) {
     .catch(error => console.error('Error fetching outlet details:', error));
 }
 
-function updateOutlet() {
+function updateOutlet(event) {
+  event.preventDefault();
   const outletId = document.getElementById('edit-outlet-id').value;
   const updatedOutlet = {
     name: document.getElementById('edit-outlet-name').value,
@@ -201,10 +209,11 @@ function updateOutlet() {
     close_time: document.getElementById('edit-outlet-close-time').value
   };
 
-  fetch(`http://localhost:3000/api/outlets/${outletId}`, {
-    method: 'PUT',
+  fetch(`${apiurl}/api/outlets/${outletId}`, {
+    method: 'PATCH',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'x-api-key': 'metis-at-insiit'
     },
     body: JSON.stringify(updatedOutlet)
   })
@@ -212,15 +221,49 @@ function updateOutlet() {
     .then(data => {
       console.log('Outlet updated successfully:', data);
       $('#editOutletModal').modal('hide');
-      fetchOutlets();
+      window.location.reload();
+      // fetchOutlets();
     })
     .catch(error => console.error('Error updating outlet:', error));
 }
 
+function updateOutletMenu(event) {
+  event.preventDefault();
+  const outletId = document.getElementById('edit-outlet-menu-id').value;
+  const updatedMenu = hot.getData().map(item => ({
+    name: item[0],
+    price: item[1],
+  }));
+  console.log(JSON.stringify({ menu: updatedMenu }));
+
+  fetch(`${apiurl}/api/outlets/${outletId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': 'metis-at-insiit'
+    },
+    body: JSON.stringify({ menu: updatedMenu }),
+  })
+    .then(response => {
+      if (response.ok) {
+        console.log('Menu updated successfully');
+        // Close the modal
+        $('#updateOutletMenu').modal('hide');
+        window.location.reload();
+      } else {
+        throw new Error('Failed to update menu');
+      }
+    })
+    .catch(error => console.error('Error updating menu:', error));
+};
+
 function deleteOutlet(outletId) {
   if (confirm('Are you sure you want to delete this outlet?')) {
-    fetch(`http://localhost:3000/api/outlets/${outletId}`, {
-      method: 'DELETE'
+    fetch(`${apiurl}/api/outlet/${outletId}`, {
+      method: 'DELETE',
+      headers: {
+        'x-api-key': 'metis-at-insiit'
+      }
     })
       .then(response => {
         if (response.ok) {
@@ -233,44 +276,67 @@ function deleteOutlet(outletId) {
       .catch(error => console.error('Error deleting outlet:', error));
   }
 }
+
 let hot;
 
 function editOutletMenu(outletId) {
-  fetch(`http://localhost:3000/api/outlets/menu/${outletId}`)
-    .then(response => response.json())
-    .then(menu => {
-      // Assuming `menu` is an array of objects with each object representing a menu item
-      if (menu && menu.length > 0) {
-        // Extracting item names and prices from the menu array
-        const itemData = menu.map(item => [item.name, item.price]);
+  fetch(`${apiurl}/api/outlets/menu/${outletId}`)
+  .then(response => response.json())
+  .then(menu => {
+    document.getElementById('edit-outlet-menu-id').value = outletId;
 
+    if (menu && menu.length > 0) {
+      const itemData = menu.map(item => [item.name, item.price]);
 
-        // Creating a Handsontable instance or updating an existing one with the retrieved data
-        if (!hot) { // Assuming `hot` is the variable representing the Handsontable instance
-          hot = new Handsontable(document.getElementById('hot-container'), {
-            data: itemData,
-            rowHeaders: true,
-            colHeaders: ['Item Name', 'Price'],
-            rowWidth: 100,
-            height: 500,
-            width: '100%',
-            readOnly: false,
-            colWidths: 100,
-            rowHeights: 60,
-            stretchH: 'all',
-            stretchW: 'all',
-            manualColumnResize: true,
-            autoWrapRow: true,
-            autoWrapCol: true,
-            contextMenu: true,
-            licenseKey: 'non-commercial-and-evaluation',
-          });
-        } else {
-          hot.loadData(itemData);
-        }
+      if (!hot) { 
+        hot = new Handsontable(document.getElementById('hot-container'), {
+          data: itemData,
+          rowHeaders: true,
+          colHeaders: ['Item Name', 'Price'],
+          rowWidth: 100,
+          height: 500,
+          width: '100%',
+          readOnly: false,
+          colWidths: 100,
+          rowHeights: 60,
+          stretchH: 'all',
+          stretchW: 'all',
+          manualColumnResize: true,
+          autoWrapRow: true,
+          autoWrapCol: true,
+          contextMenu: true,
+          licenseKey: 'non-commercial-and-evaluation',
+        });
       } else {
-        console.log('Menu is empty or undefined');
+        hot.loadData(itemData);
       }
-    })
-    .catch(error => console.error('Error fetching menu:', error));
+
+    } else {
+      if (!hot) {
+        hot = new Handsontable(document.getElementById('hot-container'), {
+          data: [['', '']], // Blank row
+          rowHeaders: true,
+          colHeaders: ['Item Name', 'Price'],
+          rowWidth: 100,
+          height: 500,
+          width: '100%',
+          readOnly: false,
+          colWidths: 100,
+          rowHeights: 60,
+          stretchH: 'all',
+          stretchW: 'all',
+          manualColumnResize: true,
+          autoWrapRow: true,
+          autoWrapCol: true,
+          contextMenu: true,
+          licenseKey: 'non-commercial-and-evaluation',
+        });
+      } else {
+        hot.loadData([['', '']]); // Blank row
+      }
+    }
+  })
+  .catch(error => console.error('Error fetching menu:', error));
+
+
 }

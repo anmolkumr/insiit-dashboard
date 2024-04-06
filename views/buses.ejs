@@ -1,0 +1,298 @@
+<%- include('./partials/header'); %>
+    <!--Main Navigation-->
+    <main style="margin-top: 70px">
+        <div class="container pt-4">
+            <h4>Bus Routes</h4>
+            <br>
+            <button type="button" class="btn btn-primary" data-mdb-ripple-init data-mdb-modal-init
+                data-mdb-target="#addBuses">
+                Add Bus Schedule
+            </button> <br><br>
+
+            <div class="container pt-4">
+                <!-- Add New Event Modal -->
+                <div class="modal fade" id="addBuses" tabindex="-1" aria-labelledby="addBusesLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addBusesLabel">Add New Event</h5>
+                                <button type="button" class="btn-close" data-mdb-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addBusesForm">
+                                    <div class="mb-3">
+                                        <label for="busName" class="form-label">Bus Name</label>
+                                        <input type="text" class="form-control" id="busName" name="busName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="departureTime" class="form-label">Departure time</label>
+                                        <input type="time" class="form-control" id="departureTime" name="departureTime"
+                                            required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="destination" class="form-label">Destination</label>
+                                        <input type="text" class="form-control" id="destination" name="destination"
+                                            required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="source" class="form-label">Source</label>
+                                        <input type="text" class="form-control" id="source" name="source" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="stops" class="form-label">Stops (Separated by commas)</label>
+                                        <input type="text" class="form-control" id="stops" name="stops" required>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Route Name</th>
+                                <th>From </th>
+                                <th>To </th>
+                                <th>Via Stops</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bus-routes-body">
+                            <!-- Bus routes will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Loading spinner -->
+                <div class="text-center mt-3">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="updateBusModal" tabindex="-1" aria-labelledby="updateBusModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog .modal-fullscreen-sm-down">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="updateBusModalLabel">Update Event</h5>
+                            <button type="button" class="btn-close" data-mdb-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editBusesForm">
+                                <div class="mb-3">
+                                    <label for="busName" class="form-label">Bus ID</label>
+                                    <input type="text" class="form-control" id="edit-id" name="edit-id" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="busName" class="form-label">Bus Name</label>
+                                    <input type="text" class="form-control" id="edit-busName" name="edit-busName"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="departureTime" class="form-label">Departure time</label>
+                                    <input type="time" class="form-control" id="edit-departureTime"
+                                        name="edit-departureTime" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="destination" class="form-label">Destination</label>
+                                    <input type="text" class="form-control" id="edit-destination"
+                                        name="edit-destination" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="source" class="form-label">Source</label>
+                                    <input type="text" class="form-control" id="edit-source" name="edit-source"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="stops" class="form-label">Stops (Separated by commas)</label>
+                                    <input type="text" class="form-control" id="edit-stops" name="edit-stops" required>
+                                </div>
+
+                                <button onclick="updateBus(event)" class="btn btn-primary">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <script>
+            // Function to fetch bus routes from the API
+            function fetchBusRoutes() {
+                // Show loading spinner
+                document.querySelector('.spinner-border').style.display = 'block';
+                fetch('<%= apiurl %>/api/buses')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Once data is received, hide loading spinner and populate the table
+                        document.querySelector('.spinner-border').style.display = 'none';
+                        populateBusRoutes(data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to fetch bus routes. Please try again.');
+                        // Hide loading spinner in case of error
+                        document.querySelector('.spinner-border').style.display = 'none';
+                    });
+            }
+
+            // Function to populate bus routes in the table
+            function populateBusRoutes(busRoutesData) {
+                const tbody = document.getElementById('bus-routes-body');
+                const routes = busRoutesData;
+                routes.forEach(route => {
+                    const viaStops = route.Stops.join(', ');
+                    const row = `
+            <tr>
+              <td>${route.BusName}</td>
+              <td>${route.Source}</td>
+              <td>${route.Destination}</td>
+              <td>${viaStops}</td>
+              <td>
+                          <button class="btn btn-primary" data-mdb-ripple-init data-mdb-modal-init
+                          data-mdb-target="#updateBusModal" onclick="editBus('${route._id}')">Edit</button>
+                          <button class="btn btn-danger" onclick="deleteBus('${route._id}')">Delete</button>
+                      </td>
+            </tr>
+          `;
+                    tbody.innerHTML += row;
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                fetchBusRoutes();
+            });
+
+            document.getElementById('addBusesForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const busData = {
+                    BusName: formData.get('busName'),
+                    DepartureTime: formData.get('departureTime'),
+                    Destination: formData.get('destination'),
+                    Source: formData.get('source'),
+                    Stops: formData.get('stops').split(',').map(s => s.trim()) // Split stops by comma and remove extra spaces
+                };
+
+                try {
+                    const response = await fetch('<%= apiurl %>/api/buses', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': 'metis-at-insiit'
+                        },
+                        body: JSON.stringify(busData)
+                    });
+                    const data = await response.json();
+                    console.log('Inserted data:', data);
+                    window.location.reload();
+                } catch (error) {
+                    console.error('Error inserting data:', error);
+                }
+            });
+
+            function editBus(busId) {
+
+                fetch(`<%= apiurl %>/api/buses/${busId}`,
+                    {
+                        headers: {
+                            'x-api-key': 'metis-at-insiit'
+                        }
+                    }
+                )
+                    .then(response => response.json())
+                    .then(bus => {
+                        // Populate the modal fields with event details
+                        document.getElementById('edit-id').value = bus._id;
+                        document.getElementById('edit-busName').value = bus.BusName;
+                        document.getElementById('edit-departureTime').value = bus.DepartureTime;
+                        document.getElementById('edit-destination').value = bus.Destination;
+
+                        document.getElementById('edit-source').value = bus.Source;
+                        document.getElementById('edit-stops').value = bus.Stops;
+
+
+                        // Show the modal
+                        // $('#editEventModal').modal('show');
+                    })
+                    .catch(error => console.error('Error fetching event details:', error));
+            }
+
+            function updateBus(event) {
+                event.preventDefault();
+
+                const busId = document.getElementById('edit-id').value;
+                const updatedBus = {
+                    BusName: document.getElementById('edit-busName').value,
+                    DepartureTime: document.getElementById('edit-departureTime').value,
+                    Destination: document.getElementById('edit-destination').value,
+                    Source: document.getElementById('edit-source').value,
+                    Stops: document.getElementById('edit-stops').value.split(',').map(s => s.trim()) // Split stops by comma and remove extra spaces,
+                };
+
+                // Send PUT request to update the event
+                console.log(JSON.stringify(updatedBus));
+                fetch(`<%= apiurl %>/api/buses/${busId}`, {
+                    method: 'PUT',
+                    headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': 'metis-at-insiit'
+                        },
+                    body: JSON.stringify(updatedBus)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Bus updated successfully:', data);
+                        // Close the modal
+                        $('#updateBusModal').modal('hide');
+                        // Refresh the events table
+                        window.location.reload();
+                    })
+                    .catch(error => console.error('Error updating event:', error));
+            }
+
+            function deleteBus(busId) {
+                if (confirm('Are you sure you want to delete this bus route?')) {
+                    fetch(`<%= apiurl %>/api/buses/${busId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': 'metis-at-insiit'
+                        },
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Deleted:', data);
+                            // window.location.reload();
+                        })
+                        .catch(error => console.error('Error deleting event:', error));
+                }
+            }
+
+        </script>
+
+    </main>
+
+    <!-- MDB -->
+    <script type="text/javascript" src="js/mdb.umd.min.js"></script>
+    <!-- Custom scripts -->
+    <script type="text/javascript" src="js/admin.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    </body>
+
+    </html>

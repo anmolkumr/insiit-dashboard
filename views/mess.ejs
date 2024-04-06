@@ -32,23 +32,23 @@
             aria-current="true">
             <i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Main dashboard</span>
           </a>
-          <a href="mess.html" class="list-group-item list-group-item-action py-2 active" data-mdb-ripple-init>
+          <a href="/mess" class="list-group-item list-group-item-action py-2 active" data-mdb-ripple-init>
             <i class="fas fa-cutlery fa-fw me-3"></i><span>Mess</span>
           </a>
-          <a href="buses.html" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
+          <a href="/buses" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
               class="fas fa-bus fa-fw me-3"></i><span>Buses</span></a>
-          <a href="outlets.html" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
+          <a href="/outlets" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
               class="fas fa-shop fa-fw me-3"></i><span>Outlets</span></a>
-          <a href="events.html" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init>
+          <a href="/events" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init>
             <i class="fas fa-calendar fa-fw me-3"></i><span>Events Calender</span>
           </a>
-          <a href="representatives.html" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
+          <a href="/representatives" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
               class="fas fa-user-circle fa-fw me-3"></i><span>Representatives</span></a>
 
-          <a href="settings.html" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
+          <a href="/settings" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
               class="fas fa-gears fa-fw me-3"></i><span>Settings</span></a>
 
-          <a href="manage_admin.html" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
+          <a href="/manage_admin" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
               class="fas fa-users fa-fw me-3"></i><span>Admin Profiles</span></a>
 
         </div>
@@ -129,7 +129,7 @@
         <div id="mess-timings"></div>
         <div id="mess-rating"></div>
         <div id="edit-menu">
-          <a href="edit-menu.html" class="btn btn-primary">Edit Menu</a>
+          <a href="/edit-menu" class="btn btn-primary">Edit Menu</a>
         </div>
 
         <h2>Mess</h2>
@@ -179,7 +179,7 @@
 
         async function addMenu() {
           try {
-            const response = await fetch('http://localhost:3000/api/mess-menu'); // Fetch data from the API endpoint
+            const response = await fetch('<%= apiurl %>/api/mess-menu'); // Fetch data from the API endpoint
             const menuData = await response.json(); // Parse the JSON response
 
             globalMenuId = menuData._id; // Store the _id globally

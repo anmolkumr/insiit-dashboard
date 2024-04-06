@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Login | InsIIT Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" />
+    <link rel="stylesheet" href="css/mdb.min.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"
+        integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="
+        crossorigin="anonymous"></script>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+</head>
+
+<body>
+    <header>
+
+        <nav id="main-navbar" class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-mdb-collapse-init data-mdb-target="#sidebarMenu"
+                    aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="#">
+                    <img src="/img/Icon.png" height="35" alt="" loading="lazy" /> InsIIT Admin Panel
+                </a>
+                <ul class="navbar-nav ms-auto d-flex flex-row">
+
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <section class="vh-100" style="background-color: #dfeaff;">
+        <div class="container py-5 mt-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card shadow-2-strong" style="border-radius: 1rem;">
+                        <div class="card-body p-5 text-center">
+
+                            <h3 class="mb-5">Sign in</h3>
+
+                            <div id="g_id_onload"
+                                data-client_id="881936870792-b6ffk3acq9rrbv5dk0ocdb4nqt0ag8kk.apps.googleusercontent.com"
+                                data-context="signin" data-ux_mode="popup" data-login_uri="http://localhost:8080/"
+                                data-itp_support="true">
+                            </div>
+
+                            <!-- <div id="g_id_onload"
+                                data-client_id="881936870792-b6ffk3acq9rrbv5dk0ocdb4nqt0ag8kk.apps.googleusercontent.com"
+                                data-context="signin" data-ux_mode="popup" data-login_uri="https://insiit-dashboard.vercel.app/" data-itp_support="true">
+                            </div> -->
+
+                            <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline"
+                                data-text="signin_with" data-size="large" data-logo_alignment="left">
+                            </div>
+
+                            <div id="spinner" style="display: none;">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- MDB -->
+    <script type="text/javascript" src="js/mdb.umd.min.js"></script>
+    <!-- Custom scripts -->
+    <script type="text/javascript" src="js/admin.js"></script>
+    <script>
+        document.getElementById('signinButton').addEventListener('click', function () {
+            document.getElementById('spinner').style.display = 'block';
+
+            setTimeout(function () {
+                document.getElementById('spinner').style.display = 'none';
+            }, 2000); // Adjust the time as needed
+        });
+    </script>
+
+</body>
+
+</html>

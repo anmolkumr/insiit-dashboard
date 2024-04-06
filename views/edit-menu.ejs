@@ -70,7 +70,7 @@
 
     async function addMenu() {
       try {
-        const response = await fetch('http://localhost:3000/api/mess-menu'); // Fetch data from the API endpoint
+        const response = await fetch('<%= apiurl %>/api/mess-menu'); // Fetch data from the API endpoint
         const menuData = await response.json(); // Parse the JSON response
 
         globalMenuId = menuData._id; // Store the _id globally
@@ -115,10 +115,11 @@
       console.log(JSON.stringify(jsonData));
 
       // Send the JSON data to the API endpoint using PUT method
-      fetch(`http://localhost:3000/api/mess-menu/${id}`, {
+      fetch(`<%= apiurl %>/api/mess-menu/${id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-api-key': 'metis-at-insiit'
         },
         body: JSON.stringify(jsonData)
       })
