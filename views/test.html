@@ -4,82 +4,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Image Upload</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Image Upload</h1>
+        <input type="file" id="imageInput" class="form-control mb-3">
+        <button onclick="uploadImage()" class="btn btn-primary">Upload Image</button>
+        <div id="response" class="mt-3"></div>
+    </div>
+
+    <!-- Bootstrap JS and Axios (for making API requests) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script>
-        const jsonData = {
-            "menu": {
-                "monday": {
-                    "breakfast": [{ "name": "Poha" }, { "name": "Panchratna Dal" }],
-                    "lunch": [{ "name": "Jeera Rice" }],
-                    "snacks": [{ "name": "Poha" }],
-                    "dinner": [{ "name": "Panchratna Dal" }, { "name": "Jeera Rice" }]
-                },
-                "tuesday": {
-                    "breakfast": [{ "name": "Poha" }],
-                    "lunch": [{ "name": "Panchratna Dal" }],
-                    "snacks": [{ "name": "Poha" }],
-                    "dinner": [{ "name": "Jeera Rice" }]
-                },
-                "wednesday": {
-                    "breakfast": [{ "name": "Poha" }],
-                    "lunch": [{ "name": "Panchratna Dal" }, { "name": "Jeera Rice" }],
-                    "snacks": [{ "name": "" }],
-                    "dinner": [{ "name": "Panchratna Dal" }]
-                },
-                "thursday": {
-                    "breakfast": [{ "name": "Poha" }],
-                    "lunch": [{ "name": "" }],
-                    "snacks": [{ "name": "Poha" }],
-                    "dinner": [{ "name": "Panchratna Dal" }, { "name": "Jeera Rice" }]
-                },
-                "friday": {
-                    "breakfast": [{ "name": "Poha" }],
-                    "lunch": [{ "name": "Panchratna Dal" }],
-                    "snacks": [{ "name": "Poha" }],
-                    "dinner": [{ "name": "Jeera Rice" }]
-                },
-                "saturday": {
-                    "breakfast": [{ "name": "Poha" }],
-                    "lunch": [{ "name": "Jeera Rice" }, { "name": "Panchratna Dal" }],
-                    "snacks": [{ "name": "Poha" }],
-                    "dinner": [{ "name": "" }]
-                },
-                "sunday": {
-                    "breakfast": [{ "name": "" }],
-                    "lunch": [{ "name": "Panchratna Dal" }, { "name": "Jeera Rice" }, { "name": "Poha" }],
-                    "snacks": [{ "name": "Poha" }],
-                    "dinner": [{ "name": "" }]
-                }
+        function uploadImage() {
+            const fileInput = document.getElementById('imageInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select an image');
+                return;
             }
-        };
 
-        // Extracting distinct names
-        const distinctNames = Object.values(jsonData.menu)
-            .flatMap(day => Object.values(day))
-            .flatMap(meals => meals.map(item => item.name))
-            .filter((value, index, self) => self.indexOf(value) === index && value !== "");
+            const formData = new FormData();
+            formData.append('image', file);
 
-        console.log(distinctNames);
-        const menuNames = [];
-
-        fetch('https://insiit-api.onrender.com/mess_menu_item')
-            .then(response => response.json())
-            .then(data => {
-                // Extract the array of items
-                const items = data.items;
-
-                // Extract names of menu items
-                const menuNames = items.map(item => item.name);
-                console.log(menuNames);
+            axios.post('https://api.imgbb.com/1/upload?key=986224ae6ff92821fe7351451654422d', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             })
-            .catch(error => console.error('Error fetching menu items:', error));
-
-        const nonMatchingItems = distinctNames.filter(name => !menuNames.includes(name));
-        console.log(nonMatchingItems);
-
+                .then(response => {
+                    const imageUrl = response.data.data.url;
+                    const outputDiv = document.getElementById('response');
+                    outputDiv.innerHTML = `
+                    <div class="alert alert-success" role="alert">
+                        Image uploaded successfully! <a href="${imageUrl}" target="_blank">View Image</a>
+                    </div>
+                `;
+                })
+                .catch(error => {
+                    console.error('Error uploading image:', error);
+                    const outputDiv = document.getElementById('response');
+                    outputDiv.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        Error uploading image. Please try again.
+                    </div>
+                `;
+                });
+        }
     </script>
 </body>
 
