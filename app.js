@@ -63,6 +63,7 @@ app.get('/logout', (req, res) => {
 
 
 app.get("/", checkAuthenticated, function (req, res) {
+    
     if (req.user) {
         console.log(req.user);
 

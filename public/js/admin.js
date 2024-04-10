@@ -1,5 +1,6 @@
 // Function to handle form submission for adding a new event
 const apiurl = 'https://insiit-backend-node.vercel.app';
+// const apiurl = 'http://localhost:3000';
 
 if (document.getElementById('addEventForm')) {
   document.getElementById('addEventForm').addEventListener('submit', async function (event) {
@@ -21,7 +22,8 @@ if (document.getElementById('addEventForm')) {
       const response = await fetch(`${apiurl}/api/events`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-api-key': 'metis-at-insiit'
         },
         body: JSON.stringify(eventData)
       });
@@ -29,7 +31,7 @@ if (document.getElementById('addEventForm')) {
         throw new Error('Failed to add event');
       }
       // If successful, reload the page to see the updated list of events
-      // window.location.reload();
+      window.location.reload();
     } catch (error) {
       console.error('Error:', error);
       alert('Failed to add event. Please try again.');
@@ -281,62 +283,62 @@ let hot;
 
 function editOutletMenu(outletId) {
   fetch(`${apiurl}/api/outlets/menu/${outletId}`)
-  .then(response => response.json())
-  .then(menu => {
-    document.getElementById('edit-outlet-menu-id').value = outletId;
+    .then(response => response.json())
+    .then(menu => {
+      document.getElementById('edit-outlet-menu-id').value = outletId;
 
-    if (menu && menu.length > 0) {
-      const itemData = menu.map(item => [item.name, item.price]);
+      if (menu && menu.length > 0) {
+        const itemData = menu.map(item => [item.name, item.price]);
 
-      if (!hot) { 
-        hot = new Handsontable(document.getElementById('hot-container'), {
-          data: itemData,
-          rowHeaders: true,
-          colHeaders: ['Item Name', 'Price'],
-          rowWidth: 100,
-          height: 500,
-          width: '100%',
-          readOnly: false,
-          colWidths: 100,
-          rowHeights: 60,
-          stretchH: 'all',
-          stretchW: 'all',
-          manualColumnResize: true,
-          autoWrapRow: true,
-          autoWrapCol: true,
-          contextMenu: true,
-          licenseKey: 'non-commercial-and-evaluation',
-        });
+        if (!hot) {
+          hot = new Handsontable(document.getElementById('hot-container'), {
+            data: itemData,
+            rowHeaders: true,
+            colHeaders: ['Item Name', 'Price'],
+            rowWidth: 100,
+            height: 500,
+            width: '100%',
+            readOnly: false,
+            colWidths: 100,
+            rowHeights: 60,
+            stretchH: 'all',
+            stretchW: 'all',
+            manualColumnResize: true,
+            autoWrapRow: true,
+            autoWrapCol: true,
+            contextMenu: true,
+            licenseKey: 'non-commercial-and-evaluation',
+          });
+        } else {
+          hot.loadData(itemData);
+        }
+
       } else {
-        hot.loadData(itemData);
+        if (!hot) {
+          hot = new Handsontable(document.getElementById('hot-container'), {
+            data: [['', '']], // Blank row
+            rowHeaders: true,
+            colHeaders: ['Item Name', 'Price'],
+            rowWidth: 100,
+            height: 500,
+            width: '100%',
+            readOnly: false,
+            colWidths: 100,
+            rowHeights: 60,
+            stretchH: 'all',
+            stretchW: 'all',
+            manualColumnResize: true,
+            autoWrapRow: true,
+            autoWrapCol: true,
+            contextMenu: true,
+            licenseKey: 'non-commercial-and-evaluation',
+          });
+        } else {
+          hot.loadData([['', '']]); // Blank row
+        }
       }
-
-    } else {
-      if (!hot) {
-        hot = new Handsontable(document.getElementById('hot-container'), {
-          data: [['', '']], // Blank row
-          rowHeaders: true,
-          colHeaders: ['Item Name', 'Price'],
-          rowWidth: 100,
-          height: 500,
-          width: '100%',
-          readOnly: false,
-          colWidths: 100,
-          rowHeights: 60,
-          stretchH: 'all',
-          stretchW: 'all',
-          manualColumnResize: true,
-          autoWrapRow: true,
-          autoWrapCol: true,
-          contextMenu: true,
-          licenseKey: 'non-commercial-and-evaluation',
-        });
-      } else {
-        hot.loadData([['', '']]); // Blank row
-      }
-    }
-  })
-  .catch(error => console.error('Error fetching menu:', error));
+    })
+    .catch(error => console.error('Error fetching menu:', error));
 
 
 }

@@ -27,7 +27,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="departureTime" class="form-label">Departure time</label>
-                                        <input type="time" class="form-control" id="departureTime" name="departureTime"
+                                        <input type="text" class="form-control" id="departureTime" name="departureTime"
                                             required>
                                     </div>
                                     <div class="mb-3">
@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="departureTime" class="form-label">Departure time</label>
-                                    <input type="time" class="form-control" id="edit-departureTime"
+                                    <input type="text" class="form-control" id="edit-departureTime"
                                         name="edit-departureTime" required>
                                 </div>
                                 <div class="mb-3">
@@ -249,9 +249,9 @@
                 fetch(`<%= apiurl %>/api/buses/${busId}`, {
                     method: 'PUT',
                     headers: {
-                            'Content-Type': 'application/json',
-                            'x-api-key': 'metis-at-insiit'
-                        },
+                        'Content-Type': 'application/json',
+                        'x-api-key': 'metis-at-insiit'
+                    },
                     body: JSON.stringify(updatedBus)
                 })
                     .then(response => response.json())
@@ -277,7 +277,7 @@
                         .then(response => response.json())
                         .then(data => {
                             console.log('Deleted:', data);
-                            // window.location.reload();
+                            window.location.reload();
                         })
                         .catch(error => console.error('Error deleting event:', error));
                 }
