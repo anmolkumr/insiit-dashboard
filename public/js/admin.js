@@ -117,9 +117,10 @@ function updateEvent(event) {
     .then(data => {
       console.log('Event updated successfully:', data);
       // Close the modal
-      $('#editEventModal').modal('hide');
+      // $('#editEventModal').modal('hide');
       // Refresh the events table
-      // fetchEvents();
+      fetchEvents();
+      window.location.reload();
     })
     .catch(error => console.error('Error updating event:', error));
 }
