@@ -224,7 +224,7 @@ function updateOutlet(event) {
       console.log('Outlet updated successfully:', data);
       $('#editOutletModal').modal('hide');
       window.location.reload();
-      // fetchOutlets();
+      fetchOutlets();
     })
     .catch(error => console.error('Error updating outlet:', error));
 }
