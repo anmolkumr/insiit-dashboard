@@ -11,9 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.9",
     "express": "^4.19.2",
     "google-auth-library": "^9.7.0",
+    "mongoose": "^8.3.1",
     "path": "^0.12.7",
     "pth": "^1.0.0"
   }

@@ -3,7 +3,6 @@
 
   <main style="margin-top: 58px">
     <div class="container pt-4">
-      <!-- Add New Event Modal -->
       <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
@@ -47,7 +46,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="eventAddedByInput" class="form-label">Added By</label>
-                  <input type="text" class="form-control" id="eventAddedByInput" required>
+                  <input type="text" class="form-control" id="eventAddedByInput" value="<%= name %>" disabled>
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
               </form>
@@ -96,7 +95,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="edit-event-added-by" class="form-label">Added By</label>
-                  <input type="text" class="form-control" id="edit-event-added-by" required>
+                  <input type="text" class="form-control" id="edit-event-added-by" disabled>
                 </div>
                 <button onclick="updateEvent(event)" class="btn btn-primary">Submit</button>
               </form>
